@@ -1,0 +1,85 @@
+{
+    "name": "set_output_json_format",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "mcq": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "question": {
+                            "type": "string",
+                            "description": "unique mcq Question generated "
+                        },
+                        "options": {
+                            "type": "object",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "a": {
+                                        "type": "string",
+                                        "description": "first option for generated MCQ"
+                                    },
+                                    "b": {
+                                        "type": "string",
+                                        "description": "second option for generated MCQ"
+                                    },
+                                    "c": {
+                                        "type": "string",
+                                        "description": "third option for generated MCQ"
+                                    },
+                                    "d": {
+                                        "type": "string",
+                                        "description": "fourth option for generated MCQ"
+                                    }
+                                }
+                            }
+                        },
+                        "answer": {
+                            "type": "object",
+                            "properties": {
+                                "answer": {
+                                    "type": "string",
+                                    "description": "Correct answer of the generated question from the options"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "fib": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "question": {
+                            "type": "string",
+                            "description": "unique fill in the blank Question"
+                        },
+                        "answer": {
+                            "type": "string",
+                            "description": "correct one word answer of the generated question"
+                        }
+                    }
+                }
+            },
+            "sa": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "question": {
+                            "type": "string",
+                            "description": "unique short answer Question"
+                        },
+                        "answer": {
+                            "type": "string",
+                            "description": "answer of the short answer question"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

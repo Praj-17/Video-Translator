@@ -1,0 +1,14 @@
+https://medium.com/@ruslanmv/how-to-translate-videos-from-youtube-with-python-23af92ace878
+
+https://github.com/ad17171717/YouTube-Tutorials/blob/main/Machine%20Learning%20with%20Python/Machine_Learning_with_Python!_Translating_YouTube_Subtitles.ipynb
+
+https://github.com/ruslanmv/Youtube-Video-Translator.git
+
+https://github.com/DeeepMaker/subtitle-to-audio/tree/main
+
+https://stackoverflow.com/questions/75794919/how-to-segment-and-transcribe-an-audio-from-a-video-into-timestamped-segments
+
+https://www.youtube.com/watch?v=XX-ET_-onYU
+
+ImagePick Download
+https://stackoverflow.com/questions/51928807/moviepy-cant-detect-imagemagick-binary-on-windows
