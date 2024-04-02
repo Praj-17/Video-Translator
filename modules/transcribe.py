@@ -67,12 +67,16 @@ class TrascribeSRT():
       #write the text in its original language
       original_subs += f'\n{segment['text'][1:]}\n\n'
 
+    
+
     #translate the text
     #text length is limited to 5000 characters
     translated_subs = ''
     for line in original_subs.split('\n'):
       translated_subs += f"{GoogleTranslator(source='auto', target=destination_language).translate(line)}\n"
 
+    with open(os.path.join(os.path.dirname(mp3_file), os.getenv("default_text_save_file_name") ), mode="w", encoding = "utf-8") as txt_output:
+      txt_output.write(results['text'])
     with open(os.path.join( os.path.dirname(mp3_file), os.getenv("defualt_original_subtitles_name")),mode='w', encoding = "utf-8") as sub_output:
       sub_output.write(original_subs)
 

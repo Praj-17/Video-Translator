@@ -52,6 +52,23 @@ https://imagemagick.org/script/download.php#macosx
 
 ## Run the Code
 
+### Video Translation
+
+Go to the `video_translator.py` file, update the input path of the input video and run
+```
+python video_translator.py
+```
+
+### Question Generation
+Go to the `question_generator.py` file, update the input path of the input video
+```
+python question_generator.py
+```
+### Summary Generation
+Go to the `summarizer.py` file, update the input path of the input video
+```
+python summarizer.py
+```
 
 ## Transcript Generation
 

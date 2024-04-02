@@ -42,8 +42,8 @@ class SRTCorrecter:
                 outfile.seek(0)  # Go to the beginning of the file
                 outfile.writelines(content[:-1])  # Write back all but the last line
                 outfile.truncate()
-        output_file_ass = self.convert_srt_to_ssa(output_file)
-        return output_file_ass
+        # output_file_ass = self.convert_srt_to_ssa(output_file)
+        return output_file
 
 if __name__ == "__main__":
     corecter = SRTCorrecter()
