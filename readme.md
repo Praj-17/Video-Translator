@@ -50,6 +50,12 @@ https://imagemagick.org/script/download.php#linux
 https://imagemagick.org/script/download.php#macosx
 ```
 
+
+### Step-4 Get the `.env` file shared with the code instructions or from the following url and paste in the root directory
+
+```
+https://drive.google.com/file/d/1_uQR5VC33LKKDJR3aT727R7uN_1VqscG/view?usp=sharing
+```
 ## Run the Code
 
 ### Video Translation
