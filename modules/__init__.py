@@ -6,3 +6,4 @@ from modules.transcribe import TrascribeSRT
 from modules.file_organizer import FileOrganizer
 from modules.add_subtitles import SubtitleAdder
 from modules.correct_srt import SRTCorrecter
+from modules.VideoAttacherAndSubtitler import VideoAttacherAndSubtitler

@@ -53,19 +53,14 @@ class TimeParser():
 
         # Calculate duration
         duration = end_time - start_time
-        print("Duration wo sconds", duration)
         total_seconds = duration.total_seconds()
         # Return duration as a timedelta object
-        print("Total Seconds",total_seconds )
         # Format to show exactly 10 decimal places
-        formatted_total_seconds = "{:.15f}".format(total_seconds)
         # or using an f-string
-        print("Total Seconds accurate", formatted_total_seconds)
 
         return total_seconds
     def add_miliseconds(self, time, sep = "."):
         split = time.split(sep)
         if not len(split) > 1:
-            print("adding miliseconds")
             time = time +  sep + "00"
         return time

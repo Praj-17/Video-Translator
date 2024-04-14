@@ -16,7 +16,6 @@ class TrascribeSRT():
   def __init__(self) -> None:
     model_size = os.getenv("model_size")
     self.model = whisper.load_model(model_size, device="cpu")
-    self.lang_dict = GoogleTranslator().get_supported_languages(as_dict=True)
 
   def mp3_to_translated_srt(self, mp3_file,destination_language = "es"):
 

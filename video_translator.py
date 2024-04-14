@@ -4,9 +4,8 @@ from modules import FileOrganizer
 from modules import TrascribeSRT
 from modules import SRTToAudioConverter
 from modules import MP3Merger
-from modules import VideoAttacher
 from modules import SRTCorrecter
-from modules import SubtitleAdder
+from modules import VideoAttacherAndSubtitler
 import os
 
 class VideoTranslator:
@@ -16,14 +15,14 @@ class VideoTranslator:
        self.transcriber = TrascribeSRT()
        self.audio_generator = SRTToAudioConverter()
        self.mp3_merger = MP3Merger()
-       self.video_attacher = VideoAttacher()
+       self.audio_attacher_and_subtitler = VideoAttacherAndSubtitler()
        self.correcter = SRTCorrecter()
-       self.subtitle_adder = SubtitleAdder()
+
 
     def translate(self, path_to_video):
-        # output_path_folder = self.file_organizer.initialize(path_to_video)
-        # output_path = os.path.join(output_path_folder, self.file_organizer.get_file_name_without_extension_from_path(path_to_video) + ".mp3")
-        # output_path_video = os.path.join(output_path_folder, self.file_organizer.get_file_name_without_extension_from_path(path_to_video) + "_translated" +  ".mp4")
+        output_path_folder = self.file_organizer.initialize(path_to_video)
+        output_path = os.path.join(output_path_folder, self.file_organizer.get_file_name_without_extension_from_path(path_to_video) + ".mp3")
+        output_path_video = os.path.join(output_path_folder, self.file_organizer.get_file_name_without_extension_from_path(path_to_video) + "_translated" +  ".mp4")
 
 
         # # #Step 1 is to extract the audio
@@ -39,20 +38,25 @@ class VideoTranslator:
         # # Step-4 Merge all mp3 files
         # merged_file = self.mp3_merger.merge_wav_files_with_silence(initial_silence, output_folder, srt_file)
 
+        # # Step-5 Correct the SRT file to be able to parse it
+        # corrected_srt   = self.correcter.correct_srt_timestamps(srt_file)
+
         # # Step-5 Attach new audio to video
         # translated_video = self.video_attacher.attach_audio_to_video(path_to_video, merged_file, output_path_video)
 
-        # Step-5 Correct the SRT file to be able to parse it
-        # corrected_srt_ass   = self.correcter.correct_srt_timestamps(srt_file)
+
 
         #Step=6 Add Subtitles to the video
-        final_video = self.subtitle_adder.add_subtitles_to_video(video_file=r"output\test2\test2_translated.mp4", srt_file = r"output\test\corrected_srt.srt")
+        # final_video = self.subtitle_adder.add_subtitles_to_video(video_file=translated_video, srt_file = corrected_srt_ass)
+
+        #Attach new audio to video and also the subtitles
+        final_video = self.audio_attacher_and_subtitler.add_subtitles_and_audio_to_video(path_to_video, r"output\new\merged_with_silence.wav", r"output\new\corrected_srt.srt", output_path_video)
 
         return final_video
 
 if __name__ == "__main__": 
 
-    path_to_video = r"test2.mp4"
+    path_to_video = r"new.mp4"
     
     trans = VideoTranslator()
 

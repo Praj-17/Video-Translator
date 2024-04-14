@@ -56,6 +56,20 @@ https://imagemagick.org/script/download.php#macosx
 ```
 https://drive.google.com/file/d/1_uQR5VC33LKKDJR3aT727R7uN_1VqscG/view?usp=sharing
 ```
+
+**Run the Following commands if you face any issues in Excecuting the code**
+
+```
+pip install ffmpeg
+pip install -U ffmpeg
+conda install -c conda-forge ffmpeg
+```
+
+```
+pip uninstall moviepy decorators
+pip install decorators
+pip install moviepy
+```
 ## Run the Code
 
 ### Video Translation
@@ -75,6 +89,8 @@ Go to the `summarizer.py` file, update the input path of the input video
 ```
 python summarizer.py
 ```
+
+
 
 ## Transcript Generation
 
