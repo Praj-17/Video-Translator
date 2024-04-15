@@ -19,7 +19,7 @@ class VideoTranslator:
        self.correcter = SRTCorrecter()
 
 
-    def translate(self, path_to_video):
+    def translate(self, path_to_video, voice_type = 0):
         print("Video Recieved", path_to_video)
         output_path_folder = self.file_organizer.initialize(path_to_video)
         output_path = os.path.join(output_path_folder, self.file_organizer.get_file_name_without_extension_from_path(path_to_video) + ".mp3")
