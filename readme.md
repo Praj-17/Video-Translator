@@ -78,6 +78,12 @@ pip install moviepy
 ```
 ## Run the Code
 
+### Start The Dashboard
+
+```
+python main.py
+```
+
 ### Video Translation
 
 Go to the `video_translator.py` file, update the input path of the input video and run
