@@ -57,6 +57,12 @@ https://imagemagick.org/script/download.php#macosx
 https://drive.google.com/file/d/1_uQR5VC33LKKDJR3aT727R7uN_1VqscG/view?usp=sharing
 ```
 
+### Step-5 Create a folder named `output` in the root directory
+
+```
+mkdir output
+```
+
 **Run the Following commands if you face any issues in Excecuting the code**
 
 ```
@@ -71,6 +77,12 @@ pip install decorators
 pip install moviepy
 ```
 ## Run the Code
+
+### Start The Dashboard
+
+```
+python main.py
+```
 
 ### Video Translation
 
