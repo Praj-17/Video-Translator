@@ -37,7 +37,7 @@ class FileOrganizer():
         return self.get_file_name_without_extension(basename)
 
     def initialize(self, video_file_name: str):
-        created_folder_path = os.path.join(os.getenv("default_output_folder_name"), self.get_file_name_without_extension(video_file_name))
+        created_folder_path = os.path.join(os.getenv("default_output_folder_name"), self.get_file_name_without_extension_from_path(video_file_name))
         self.create_folder_if_not_exists(created_folder_path)
         return created_folder_path
         

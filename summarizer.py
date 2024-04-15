@@ -1,13 +1,13 @@
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
-from .file_organizer import FileOrganizer
+from modules.file_organizer import FileOrganizer
 
 
 # Load environment variables from .env file
 load_dotenv()
 client = OpenAI(api_key = os.getenv("OPENAI_API_KEY"))
-from srt_parser import SRTParser
+from modules.srt_parser import SRTParser
 # from lang_translator import Translator
 
 
@@ -45,10 +45,10 @@ class OpenAISummarizer:
         return chunks
 
     def generate_summary(self, text, language = "spanish"):
-        text_chunks = summarizer.split_text_into_chunks(text)
+        text_chunks = self.split_text_into_chunks(text)
         summaries = []
         for chunk in text_chunks:
-            summary = summarizer.call_openai(chunk, language)
+            summary = self.call_openai(chunk, language)
             summaries.append(summary)
             # Concatenate summaries of all chunks
         return   " ".join(summaries)

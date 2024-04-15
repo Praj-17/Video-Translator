@@ -2,6 +2,12 @@ from moviepy.editor import VideoFileClip, concatenate_videoclips, CompositeVideo
 from moviepy.video.tools.subtitles import SubtitlesClip
 import os
 from pydub import AudioSegment
+from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips, CompositeVideoClip
+import numpy as np
+from moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip, concatenate_audioclips
+from moviepy.audio.AudioClip import AudioClip
+
+
 
 class VideoAttacherAndSubtitler:
     def __init__(self) -> None:
@@ -77,14 +83,50 @@ class VideoAttacherAndSubtitler:
 
 
 
-
     def add_subtitles_and_audio_to_video(self, video_path, audio_path, srt_file, output_path):
+        print("Video Path:", video_path)
+        print("Audio Path:", audio_path)
+        print("SRT file:", srt_file)
+        print("Output path:", output_path)
+
+        video_clip = VideoFileClip(video_path)
+        audio_clip = AudioFileClip(audio_path)
+
+        if audio_clip.duration < video_clip.duration:
+            silence_duration = video_clip.duration - audio_clip.duration
+            # Generate silent audio segment
+            silent_audio = AudioClip(lambda t: [0] * audio_clip.nchannels, duration=silence_duration, fps=audio_clip.fps)
+            # Concatenate audio clip with silent audio to match the video's duration
+            audio_clip = concatenate_audioclips([audio_clip, silent_audio])
+
+        video_clip = video_clip.set_audio(audio_clip)
+
+        subtitles = self.create_subtitles_clip_2(srt_file)
+
+        final_video = CompositeVideoClip([video_clip, subtitles.set_position(('center', 'bottom'))])
+
+        final_video.write_videofile(output_path, codec='libx264', temp_audiofile='temp-audio.m4a', remove_temp=True, audio_codec='aac')
+
+        video_clip.close()
+
+        return output_path
+
+
+
+    def add_subtitles_and_audio_to_video_2(self, video_path, audio_path, srt_file, output_path):
+            
+            print("Vidoe Path ", video_path)
+            print("audio Path ", audio_path)
+            print("srt file ", srt_file)
+            print("output path", output_path)
             video_clip = VideoFileClip(video_path)
             audio_clip = AudioFileClip(audio_path)
             
             if audio_clip.duration < video_clip.duration :
                 silence_duration = video_clip.duration - audio_clip.duration
                 silent_audio = AudioSegment.silent(duration=silence_duration)
+                print(audio_clip, silent_audio)
+                print(type(audio_clip), type(silent_audio))
                 audio_clip = audio_clip + silent_audio
             
             video_clip = video_clip.set_audio(audio_clip)
