@@ -46,7 +46,7 @@ with gr.Blocks() as app:
     with gr.Row():
         with gr.Column():
             video_input = gr.Video(label="Upload your video here")
-            voice_type_input = gr.Radio(["Type 0", "Type 1"], label="Select Voice Type")
+            voice_type_input = gr.Radio(["Male", "Female"], label="Select Voice Type")
             num_questions_input = gr.Slider(1, 10, 1, label="Number of Questions")
             translate_btn = gr.Button("Translate Video")
             summary_btn = gr.Button("Generate Summary")
