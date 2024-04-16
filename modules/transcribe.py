@@ -79,12 +79,12 @@ class TrascribeSRT():
     with open(os.path.join( os.path.dirname(mp3_file), os.getenv("defualt_original_subtitles_name")),mode='w', encoding = "utf-8") as sub_output:
       sub_output.write(original_subs)
 
-    with open(os.path.join( os.path.dirname(mp3_file), f'{destination_language}.srt'),mode='w',  encoding = "utf-8") as sub_output:
+    with open(os.path.join( os.path.dirname(mp3_file), os.getenv("default_srt_file_name") + '.srt'),mode='w',  encoding = "utf-8") as sub_output:
       sub_output.write(translated_subs)
 
     print('Translation Complete')
     
-    return os.path.join( os.path.dirname(mp3_file), f'{destination_language}.srt')
+    return os.path.join( os.path.dirname(mp3_file), os.getenv("default_srt_file_name") + '.srt')
 
 
   def srt_translate(self, srt_file,destination_language):
@@ -119,6 +119,28 @@ class TrascribeSRT():
       sub_output.write(translated_str)
 
     print('Translation Complete')
+
+  def save_text(self, mp3_file,destination_language, source_language = "en"):
+     #use the WhisperModel to transcribe the mp3 file
+    audio = whisper.load_audio(mp3_file)
+    # results = self.model.transcribe(mp3_file, beam_size=5)
+    results = whisper.transcribe(self.model, audio, language=source_language)
+
+    original_subs = ''
+
+    for idx,segment in enumerate(results['segments']):
+      original_subs += f'{idx+1}\n'
+      original_subs += str(datetime.timedelta(seconds=segment['start']))
+      original_subs += ' --> '
+      original_subs += f'{str(datetime.timedelta(seconds=segment['end']))}'
+
+      #write the text in its original language
+      original_subs += f'\n{segment['text'][1:]}\n\n'
+   
+    file_name = os.path.join(os.path.dirname(mp3_file), os.getenv("default_text_save_file_name") )
+    with open(file_name, mode="w", encoding = "utf-8") as txt_output:
+      txt_output.write(results['text'])
+      return file_name
 
 if __name__ == "__main__":
     print("Transcribing the video now....This may take a while on CPU")

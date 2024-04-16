@@ -1,0 +1,3 @@
+Create a detailed and succinct summary in the specified `{dest_lang}` language based on the video lecture transcript provided within triple backticks. Ensure that the summary captures the essence of the lecture content without losing critical information. Aim for clarity, coherence, and completeness in your final output. Return the synthesized summary within the designated language for effective communication and comprehension. 
+
+Transcript ```{content}```

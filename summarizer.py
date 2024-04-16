@@ -1,8 +1,9 @@
 from openai import OpenAI
+
+from modules.file_organizer import FileOrganizer
+from modules.GetTextFromVideo import GetTextFromVideo
 from dotenv import load_dotenv
 import os
-from modules.file_organizer import FileOrganizer
-
 
 # Load environment variables from .env file
 load_dotenv()
@@ -15,15 +16,17 @@ class OpenAISummarizer:
     def __init__(self) -> None:
         self.srt_parser = SRTParser()
         # self.translator = Translator()
+        self.get_text = GetTextFromVideo()
         self.fo = FileOrganizer()
-    def call_openai(self, text_chunk, dest_lang = "spanish"):
+        self.prompt_file_location = os.getenv("summary_prompt_file_location")
+    def call_openai(self, summary_prompt):
 
         
         completion = client.chat.completions.create(
         model=os.getenv("model_name"),
         messages=[
-            {"role": "system", "content": "You are a helpful teaching assistant that generates a concise summary of the given lecture transcript. Do not put any place holders. Return the Summary in {dest_lang}"},
-            {"role": "user", "content": text_chunk}
+            {"role": "system", "content": f"You are a helpful teaching assistant that generates a concise summary of the given lecture transcript."},
+            {"role": "user", "content": summary_prompt}
         ])
 
 
@@ -45,10 +48,16 @@ class OpenAISummarizer:
         return chunks
 
     def generate_summary(self, text, language = "spanish"):
+        prompt = "create summary in {dest_lang} for {content}"
         text_chunks = self.split_text_into_chunks(text)
         summaries = []
+
+        with open(self.prompt_file_location, "r") as f:
+            prompt = f.read()
+            f.close()
         for chunk in text_chunks:
-            summary = self.call_openai(chunk, language)
+            summary_prompt = prompt.format(dest_lang = language, content = chunk )
+            summary = self.call_openai(summary_prompt)
             summaries.append(summary)
             # Concatenate summaries of all chunks
         return   " ".join(summaries)
@@ -58,8 +67,12 @@ class OpenAISummarizer:
     def generate_translated_summary(self, srt_file, lang = 'es'):
             text = self.generate_summary_from_srt_file(srt_file)
             return self.translator(text, lang = lang)
+    
     def generate_summary_from_given_video(self, video_name, language = "spanish"):
         text_to_read = os.path.join(os.getenv("default_output_folder_name"), self.fo.get_file_name_without_extension_from_path(video_name), os.getenv("default_text_save_file_name"))
+        if not os.path.exists(text_to_read):
+            text_to_read = self.get_text.get_text_from_video(video_name, language = language)
+
         try:
             with open(text_to_read, "r") as f:
                 context = f.read()
@@ -73,7 +86,7 @@ if __name__ == "__main__":
     # Example usage
 
     summarizer = OpenAISummarizer()
-    video_input = "test2.mp4"
+    video_input = "test.mp4"
     summary = summarizer.generate_summary_from_given_video(video_input)
 
     print("Summary:", summary)

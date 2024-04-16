@@ -6,12 +6,13 @@ from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips,
 import numpy as np
 from moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip, concatenate_audioclips
 from moviepy.audio.AudioClip import AudioClip
+from modules.file_organizer import FileOrganizer
 
 
 
 class VideoAttacherAndSubtitler:
     def __init__(self) -> None:
-        pass
+        self.fo = FileOrganizer()
 
     def attach_audio_to_video(self, video_path, audio_path, output_path):
         video_clip = VideoFileClip(video_path)
@@ -83,11 +84,9 @@ class VideoAttacherAndSubtitler:
 
 
 
-    def add_subtitles_and_audio_to_video(self, video_path, audio_path, srt_file, output_path):
-        print("Video Path:", video_path)
-        print("Audio Path:", audio_path)
-        print("SRT file:", srt_file)
-        print("Output path:", output_path)
+    def add_subtitles_and_audio_to_video(self, video_path, audio_path, srt_file):
+        output_path_folder = os.path.dirname(audio_path)
+        output_path = os.path.join(output_path_folder, self.fo.get_file_name_without_extension_from_path(video_path) + "_translated" +  ".mp4")
 
         video_clip = VideoFileClip(video_path)
         audio_clip = AudioFileClip(audio_path)

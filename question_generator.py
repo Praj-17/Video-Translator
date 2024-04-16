@@ -4,7 +4,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from modules.file_organizer import FileOrganizer
 import os
-
+from modules.GetTextFromVideo import GetTextFromVideo
 # Load environment variables from .env file
 load_dotenv()
 client = OpenAI(api_key = os.getenv("OPENAI_API_KEY") )
@@ -20,6 +20,7 @@ class QuestionGenerator:
         with open(os.getenv("qna_constrain_file_location"), 'r') as json_file:
             self.q_and_a_json_constrain = json.load(json_file)
         self.fo = FileOrganizer()
+        self.get_text = GetTextFromVideo()
     def run_openai(self, questions_prompt, functions = []):
         completion = client.chat.completions.create(
         model = os.getenv("model_name"),
@@ -40,7 +41,8 @@ class QuestionGenerator:
         return self.run_openai(questions_prompt=prompt, functions = [self.q_and_a_json_constrain])
     def generate_questions_from_given_video(self, video_name, n = 10, language = "spanish"):
         text_to_read = os.path.join(os.getenv("default_output_folder_name"), self.fo.get_file_name_without_extension_from_path(video_name), os.getenv("default_text_save_file_name"))
-        print(text_to_read)
+        if not os.path.exists(text_to_read):
+            text_to_read = self.get_text.get_text_from_video(video_name, language = language)
         context = ""
         try:
             with open(text_to_read, "r") as f:
@@ -53,6 +55,6 @@ class QuestionGenerator:
 
 if __name__ == "__main__":
     gen = QuestionGenerator()
-    video_input = "test2.mp4"
+    video_input = "test.mp4"
     response =  gen.generate_questions(video_input, n  = 5)
     print(response)

@@ -1,11 +1,14 @@
 from moviepy.editor import VideoFileClip
+from modules.file_organizer import FileOrganizer
 import os
 
 class AudioExtractor():
     def __init__(self) -> None:
-        
+        self.fo = FileOrganizer()
         pass
-    def extract_audio_to_mp3(self, video_path, output_path):
+    def extract_audio_to_mp3(self, video_path):
+        output_path_folder = self.fo.initialize(video_path)
+        output_path = os.path.join(output_path_folder, self.fo.get_file_name_without_extension_from_path(video_path) + ".mp3")
         # Load the video clip
         video_clip = VideoFileClip(video_path)
 

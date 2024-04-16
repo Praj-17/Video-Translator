@@ -68,7 +68,7 @@ with gr.Blocks() as app:
 
     summary_btn.click(
         fn=lambda x: (generate_summary(x), create_summary_file(generate_summary(x))),
-        inputs=video_input,
+        inputs=video_input.value,
         outputs=[video_summary, download_summary_btn]
     )
 
@@ -90,4 +90,5 @@ with gr.Blocks() as app:
         outputs=video_questions
     )
 
-app.launch()
+if __name__ == "__main__":
+    app.launch(share=True)

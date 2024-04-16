@@ -34,7 +34,7 @@ class MP3Merger():
         
 
         return destination_file
-    def merge_wav_files_with_silence(self, initial_silence, folder_path, srt_file):
+    def merge_wav_files_with_silence(self, initial_silence_output_path, folder_path, srt_file):
         wav_files = [file for file in os.listdir(folder_path) if file.endswith('.wav')]
         parent_folder = os.path.dirname(folder_path)
         if not wav_files:
@@ -42,6 +42,11 @@ class MP3Merger():
             return
         wav_files = self.sort_files_in_sequence(wav_files)
         destination_file = os.path.join(parent_folder, os.getenv("default_merged_file_with_silence_name"))
+
+        #Load the initial_silence
+        with open(initial_silence_output_path,mode='r', encoding = "utf-8") as initial_silence_file:
+           initial_silence =  initial_silence_file.read()
+
         final_audio = AudioSegment.silent(duration=initial_silence)
 
         lines = self.parse_srt_file(srt_file)
