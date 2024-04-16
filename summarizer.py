@@ -69,6 +69,7 @@ class OpenAISummarizer:
             return self.translator(text, lang = lang)
     
     def generate_summary_from_given_video(self, video_name, language = "spanish"):
+        print(video_name)
         text_to_read = os.path.join(os.getenv("default_output_folder_name"), self.fo.get_file_name_without_extension_from_path(video_name), os.getenv("default_text_save_file_name"))
         print(text_to_read)
         if not os.path.exists(text_to_read):

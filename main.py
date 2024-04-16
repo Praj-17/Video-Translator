@@ -16,6 +16,7 @@ def translate_video(video_path, voice_type):
 
 def generate_summary(video_path):
     """Generate a summary from the video."""
+    print("This is vode", video_path)
     summary = summarizer.generate_summary_from_given_video(video_path)
     return summary
 
@@ -68,7 +69,7 @@ with gr.Blocks() as app:
 
     summary_btn.click(
         fn=lambda x: (generate_summary(x), create_summary_file(generate_summary(x))),
-        inputs=video_input.value,
+        inputs=video_input,
         outputs=[video_summary, download_summary_btn]
     )
 
