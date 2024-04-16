@@ -46,7 +46,7 @@ def create_questions_file(questions):
 with gr.Blocks() as app:
     with gr.Row():
         with gr.Column():
-            video_input = gr.Video(label="Upload your video here")
+            video_input = gr.Video(label="Upload your video here", autoplay = True, show_share_button = True, show_download_button = True)
             voice_type_input = gr.Radio(["Male", "Female"], label="Select Voice Type")
             num_questions_input = gr.Slider(1, 10, 1, label="Number of Questions")
             translate_btn = gr.Button("Translate Video")
