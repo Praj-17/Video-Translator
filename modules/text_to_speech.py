@@ -12,7 +12,7 @@ class TextToSpeech:
         ## Voice type: 0 for male and 1 for female
         # Initialize an instance
         voice = self.eng.getProperty('voices')  # get the available voices
-        self.eng.setProperty('voice', voice[voice_type].id)  # set the voice to the specified type
+        self.eng.setProperty('voice', voice[int(voice_type)].id)  # set the voice to the specified type
         
         # Set the volume (range is 0.0 to 1.0, where 1.0 is the maximum volume)
         self.eng.setProperty('volume', 1.0)  # Set to maximum volume
@@ -29,7 +29,10 @@ class TextToSpeech:
     
     def text_to_speech_with_duration(self, text, desired_duration_seconds, filename, voice_type=0):
         # Generate speech and save to file
-        voice = self.eng.getProperty('voices')[voice_type]  # Select voice; might need refinement for gender selection
+        if voice_type == "Male":
+            voice_type =0
+        else: voice_type = 1
+        voice = self.eng.getProperty('voices')[int(voice_type)]  # Select voice; might need refinement for gender selection
         self.eng.setProperty('voice', voice.id)
         self.eng.save_to_file(text, filename)
         self.eng.runAndWait()

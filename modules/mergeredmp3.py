@@ -45,7 +45,7 @@ class MP3Merger():
 
         #Load the initial_silence
         with open(initial_silence_output_path,mode='r', encoding = "utf-8") as initial_silence_file:
-           initial_silence =  initial_silence_file.read()
+           initial_silence =  float((initial_silence_file.read()).strip())
 
         final_audio = AudioSegment.silent(duration=initial_silence)
 

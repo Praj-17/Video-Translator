@@ -25,9 +25,8 @@ class SRTToAudioConverter():
         subs =self.srt_parser.extract_all_subtitle_info(srt_file=srt_file)
         # Add an extra folder to better organize the audio files
         output_folder = os.path.join(output_folder, os.getenv("default_audio_split_files_folder_name"))
-        os.makedirs(output_folder, exist_ok=True)
         output_file = os.path.join(output_folder, f'subtitle_{0}.wav')
-        initial_silence_output_path = os.path.join(output_folder, os.getenv("default_initial_silence_save_name"))
+        initial_silence_output_path = os.path.join(os.path.dirname(output_folder), os.getenv("default_initial_silence_save_name"))
 
         start_time, end_time, text_first =  self.srt_parser.extract_first_subtitle_info(srt_file)
         if start_time != '00:00:00':
@@ -39,7 +38,7 @@ class SRTToAudioConverter():
             initial_silence = 0.0
         
         with open(initial_silence_output_path,mode='w', encoding = "utf-8") as initial_silence_file:
-            initial_silence_file.write(initial_silence)
+            initial_silence_file.write(str(initial_silence))
 
         
 

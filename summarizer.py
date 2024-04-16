@@ -70,6 +70,7 @@ class OpenAISummarizer:
     
     def generate_summary_from_given_video(self, video_name, language = "spanish"):
         text_to_read = os.path.join(os.getenv("default_output_folder_name"), self.fo.get_file_name_without_extension_from_path(video_name), os.getenv("default_text_save_file_name"))
+        print(text_to_read)
         if not os.path.exists(text_to_read):
             text_to_read = self.get_text.get_text_from_video(video_name, language = language)
 
@@ -86,7 +87,7 @@ if __name__ == "__main__":
     # Example usage
 
     summarizer = OpenAISummarizer()
-    video_input = "test.mp4"
+    video_input = "n2.mp4"
     summary = summarizer.generate_summary_from_given_video(video_input)
 
     print("Summary:", summary)

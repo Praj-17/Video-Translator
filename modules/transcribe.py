@@ -79,12 +79,12 @@ class TrascribeSRT():
     with open(os.path.join( os.path.dirname(mp3_file), os.getenv("defualt_original_subtitles_name")),mode='w', encoding = "utf-8") as sub_output:
       sub_output.write(original_subs)
 
-    with open(os.path.join( os.path.dirname(mp3_file), os.getenv("default_srt_file_name") + '.srt'),mode='w',  encoding = "utf-8") as sub_output:
+    with open(os.path.join( os.path.dirname(mp3_file), os.getenv("default_srt_file_name")),mode='w',  encoding = "utf-8") as sub_output:
       sub_output.write(translated_subs)
 
     print('Translation Complete')
     
-    return os.path.join( os.path.dirname(mp3_file), os.getenv("default_srt_file_name") + '.srt')
+    return os.path.join( os.path.dirname(mp3_file), os.getenv("default_srt_file_name"))
 
 
   def srt_translate(self, srt_file,destination_language):
