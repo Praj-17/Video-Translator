@@ -39,6 +39,12 @@ class QuestionGenerator:
             prompt = prompt.format(n = n, language = language, context = context)
             f.close()
         return self.run_openai(questions_prompt=prompt, functions = [self.q_and_a_json_constrain])
+    def save_generated_questions(self, text_to_read, questions):
+        questions_save_file = os.path.join(os.path.dirname(text_to_read), os.getenv("default_questions_save_path"))
+        with open(questions_save_file, 'w') as file:
+            json.dump(questions, file, indent=4, ensure_ascii=False, sort_keys=True)
+        return questions_save_file
+
     def generate_questions_from_given_video(self, video_name, n = 10, language = "spanish"):
         text_to_read = os.path.join(os.getenv("default_output_folder_name"), self.fo.get_file_name_without_extension_from_path(video_name), os.getenv("default_text_save_file_name"))
         if not os.path.exists(text_to_read):
@@ -49,6 +55,8 @@ class QuestionGenerator:
                 context = f.read()
         except Exception as e:
             print("Please translate the video first")
+        questions = self.generate_questions(context=context, n=n, language= language)
+        questions_save_file = self.save_generated_questions(text_to_read, questions)
         return self.generate_questions(context=context, n=n, language= language)
 
 
