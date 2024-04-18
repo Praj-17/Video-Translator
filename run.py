@@ -14,15 +14,15 @@ class AsyncRunner:
 
     async def translate(self, file_path):
         # Assuming `translate_video` is an async method of `VideoTranslator`
-        return await self.video_translator.translate_video(file_path)
+        return await self.video_translator.translate(file_path)
 
     async def generate_questions(self, file_path):
         # Assuming `generate_video_questions` is an async method of `QuestionGenerator`
-        return await self.question_generator.generate_video_questions(file_path)
+        return await self.question_generator.generate_questions_from_given_video(file_path)
 
     async def generate_summary(self, file_path):
         # Assuming `summarize_video` is an async method of `OpenAISummarizer`
-        return await self.summarizer.summarize_video(file_path)
+        return await self.summarizer.generate_summary_from_given_video(file_path)
 
     async def process_video(self, file_path, translate, questions, summary):
         tasks = []
@@ -46,5 +46,5 @@ def run_on_a_folder(folder_path, translate=False, questions=False, summary=False
     asyncio.run(runner.process_folder(folder_path, translate, questions, summary))
 
 if __name__ == "__main__":
-    folder_path = 'path_to_your_folder'  # Specify the folder path here
+    folder_path = 'videos'  # Specify the folder path here
     run_on_a_folder(folder_path, translate=True, questions=True, summary=True)

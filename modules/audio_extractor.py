@@ -12,7 +12,6 @@ class AudioExtractor():
 
         output_path_folder,updated_video_path = self.fo.initialize(video_path)
         output_path = os.path.join(output_path_folder, self.fo.get_file_name_without_extension_from_path(video_path) + ".mp3")
-        print("This is output Folder for mp3", output_path)
         # Load the video clip
 
         # Extract the audio
