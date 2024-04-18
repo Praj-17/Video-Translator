@@ -67,11 +67,14 @@ class OpenAISummarizer:
     def generate_translated_summary(self, srt_file, lang = 'es'):
             text = self.generate_summary_from_srt_file(srt_file)
             return self.translator(text, lang = lang)
+    def save_generated_summary(self, text_to_read,summary):
+        summary_save_file = os.path.join(os.path.dirname(text_to_read), os.getenv("default_summary_save_name"))
+        with open(summary_save_file, "w") as s:
+            s.write(summary)
+        return summary_save_file
     
     def generate_summary_from_given_video(self, video_name, language = "spanish"):
-        print(video_name)
         text_to_read = os.path.join(os.getenv("default_output_folder_name"), self.fo.get_file_name_without_extension_from_path(video_name), os.getenv("default_text_save_file_name"))
-        print(text_to_read)
         if not os.path.exists(text_to_read):
             text_to_read = self.get_text.get_text_from_video(video_name, language = language)
 
@@ -80,7 +83,9 @@ class OpenAISummarizer:
                 context = f.read()
         except Exception as e:
             print("Please translate the video first")
-        return self.generate_summary(text=context,language = language)
+        summary = self.generate_summary(text=context,language = language)
+        summary_save_file = self.save_generated_summary(text_to_read, summary)
+        return summary
 
 
 
