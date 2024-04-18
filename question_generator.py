@@ -41,6 +41,7 @@ class QuestionGenerator:
         return self.run_openai(questions_prompt=prompt, functions = [self.q_and_a_json_constrain])
     def save_generated_questions(self, text_to_read, questions):
         questions_save_file = os.path.join(os.path.dirname(text_to_read), os.getenv("default_questions_save_path"))
+        print("saved to ", questions_save_file)
         with open(questions_save_file, 'w') as file:
             json.dump(questions, file, indent=4, ensure_ascii=False, sort_keys=True)
         return questions_save_file
@@ -57,12 +58,12 @@ class QuestionGenerator:
             print("Please translate the video first")
         questions = self.generate_questions(context=context, n=n, language= language)
         questions_save_file = self.save_generated_questions(text_to_read, questions)
-        return self.generate_questions(context=context, n=n, language= language)
+        return questions
 
 
 
 if __name__ == "__main__":
     gen = QuestionGenerator()
-    video_input = "test.mp4"
-    response =  gen.generate_questions(video_input, n  = 5)
+    video_input = "n2.mp4"
+    response =  gen.generate_questions_from_given_video(video_input, n  = 5)
     print(response)
