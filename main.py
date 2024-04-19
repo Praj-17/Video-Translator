@@ -43,23 +43,82 @@ def create_questions_file(questions):
     pdf.output(path)
     return path
 
-with gr.Blocks() as app:
+# Define themes and add toggle button styles
+themes = {
+    "dark": """
+        body, .gradio-container { background-color: #282a36; color: #f8f8f2; }
+        button, input, textarea, select, label { 
+            background-color: #44475a; 
+            color: #f8f8f2; 
+            border: 1px solid #6272a4; 
+        }
+        button:hover { background-color: #6272a4; }
+        .gradio-file, .gradio-dropdown, .gradio-slider, .gradio-label, .gradio-container, .gradio-button, .gradio-textbox {
+            background-color: #44475a; 
+            color: #f8f8f2;
+        }
+        #toggle-theme {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+    """,
+    "light": """
+        body, .gradio-container { background-color: #FFF; color: #333; }
+        button, input, textarea, select, label { 
+            background-color: #EEE; 
+            color: #333; 
+            border: 1px solid #CCC; 
+        }
+        button:hover { background-color: #DDD; }
+        .gradio-file, .gradio-dropdown, .gradio-slider, .gradio-label, .gradio-container, .gradio-button, .gradio-textbox {
+            background-color: #FFF; 
+            color: #333;
+        }
+        #toggle-theme {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+    """
+}
+
+current_theme = "dark"  # Default theme
+
+def toggle_theme():
+    global current_theme
+    new_value = "🌞" if current_theme == "dark" else "🌟"
+    current_theme = "light" if current_theme == "dark" else "dark"
+    gr.Interface.update()  # Not a real function - just illustrating what would be needed
+    return new_value
+
+with gr.Blocks(css=themes[current_theme]) as app:
     with gr.Row():
-        with gr.Column():
-            video_input = gr.Video(label="Upload your video here", autoplay = True, show_share_button = True, show_download_button = True)
-            voice_type_input = gr.Radio(["Male", "Female"], label="Select Voice Type")
-            num_questions_input = gr.Slider(1, 10, 1, label="Number of Questions")
-            translate_btn = gr.Button("Translate Video")
-            summary_btn = gr.Button("Generate Summary")
-            questions_btn = gr.Button("Generate Questions")
-        with gr.Column():
-            translated_video = gr.Video(label="Translated Video")
-            video_summary = gr.Textbox(label="Video Summary", lines=10, interactive=True)
-            download_summary_btn = gr.File(label="Download Summary")
-            video_questions = gr.Textbox(label="Questions Generated", lines=10, interactive=True)
-            download_questions_btn = gr.File(label="Download Questions")
-            copy_summary_btn = gr.Button("Copy Summary")
-            copy_questions_btn = gr.Button("Copy Questions")
+        theme_toggle = gr.Button(value="🌞" if current_theme == "dark" else "🌟", elem_id="toggle-theme")
+        theme_toggle.click(toggle_theme, inputs=[theme_toggle], outputs=theme_toggle)
+
+    with gr.Column():
+        video_input = gr.Video(label="Upload your video here", autoplay=True, show_share_button=True, show_download_button=True)
+        voice_type_input = gr.Radio(["Male", "Female"], label="Select Voice Type")
+        num_questions_input = gr.Dropdown([str(i) for i in range(1, 21)], label="Number of Questions")
+        translate_btn = gr.Button("Translate Video")
+        summary_btn = gr.Button("Generate Summary")
+        questions_btn = gr.Button("Generate Questions")
+        translated_video = gr.Video(label="Translated Video")
+        video_summary = gr.Textbox(label="Video Summary", lines=10, interactive=True)
+        download_summary_btn = gr.File(label="Download Summary")
+        video_questions = gr.Textbox(label="Questions Generated", lines=10, interactive=True)
+        download_questions_btn = gr.File(label="Download Questions")
+        copy_summary_btn = gr.Button("Copy Summary")
+        copy_questions_btn = gr.Button("Copy Questions")
 
     translate_btn.click(
         fn=translate_video,
