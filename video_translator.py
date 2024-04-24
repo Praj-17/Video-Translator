@@ -6,6 +6,7 @@ from modules import SRTToAudioConverter
 from modules import MP3Merger
 from modules import SRTCorrecter
 from modules import VideoAttacherAndSubtitler
+from modules import TempoAnalyzer
 import os
 
 class VideoTranslator:
@@ -17,6 +18,7 @@ class VideoTranslator:
        self.mp3_merger = MP3Merger()
        self.audio_attacher_and_subtitler = VideoAttacherAndSubtitler()
        self.correcter = SRTCorrecter()
+       self.tempo = TempoAnalyzer()
 
 
     def translate(self, path_to_video, voice_type = 0):
@@ -63,13 +65,19 @@ class VideoTranslator:
             final_video = self.audio_attacher_and_subtitler.add_subtitles_and_audio_to_video(path_to_video, merged_file, corrected_srt)
 
         return final_video
+    def analyse_tempo(self, video_path):
+        #Get srt_path_from_video_path
+        print("Recieved: ",video_path)
+        output_path_folder,updated_video_path = self.file_organizer.initialize(video_path)
+        srt_name =  os.path.join(os.path.dirname(updated_video_path), os.getenv("corrected_srt_name"))
+        self.tempo.plot_wpm_over_time_with_matplotlib(srt_name)
 
 if __name__ == "__main__": 
 
-    path_to_video = r"videos\n2.mp4"
+    path_to_video = r"videos\test2.mp4"
     
     trans = VideoTranslator()
 
-    trans.translate(path_to_video)
+    trans.analyse_tempo(path_to_video)
 
 
