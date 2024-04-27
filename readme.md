@@ -50,11 +50,10 @@ https://imagemagick.org/script/download.php#linux
 https://imagemagick.org/script/download.php#macosx
 ```
 
-
-### Step-4 Get the `.env` file shared with the code instructions or from the following url and paste in the root directory
+### Step-4 Replace teh `example.env` file to `.env`. and paste your `OPENAI_API_KEY` in line `23` as follows
 
 ```
-https://drive.google.com/file/d/1_uQR5VC33LKKDJR3aT727R7uN_1VqscG/view?usp=sharing
+OPENAI_API_KEY = sk-xxxxxxxxxxxxxxxxxx
 ```
 
 ### Step-5 Create a folder named `output` in the root directory
@@ -65,12 +64,40 @@ mkdir output
 
 **Run the Following commands if you face any issues in Excecuting the code**
 
+if you encounter the following error
+
+
 ```
-pip install ffmpeg
-pip install -U ffmpeg
+Traceback (most recent call last):
+  File "D:\Video-Translator\video_translator.py", line 126, in <module>
+    trans.translate(path_to_video)
+  File "D:\Video-Translator\video_translator.py", line 43, in translate
+    srt_file = self.transcriber.mp3_to_translated_srt(mp3_from_video)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Video-Translator\modules\transcribe.py", line 57, in mp3_to_translated_srt
+    audio = whisper.load_audio(mp3_file)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TI-SJL-0020\anaconda3\envs\test2\Lib\site-packages\whisper\audio.py", line 58, in load_audio
+    out = run(cmd, capture_output=True, check=True).stdout
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TI-SJL-0020\anaconda3\envs\test2\Lib\subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\TI-SJL-0020\anaconda3\envs\test2\Lib\subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "C:\Users\TI-SJL-0020\anaconda3\envs\test2\Lib\subprocess.py", line 1538, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [WinError 2] The system cannot find the file specified
+```
+
+Run the following command
+```
 conda install -c conda-forge ffmpeg
 ```
 
+
+If you encounter other errors, try these commands
 ```
 pip uninstall moviepy decorators
 pip install decorators

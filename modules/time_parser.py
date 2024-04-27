@@ -1,4 +1,5 @@
 from datetime import datetime
+import re
 class TimeParser():
     def __init__(self) -> None:
         pass
@@ -22,7 +23,12 @@ class TimeParser():
         start = self.convert_srt_time_to_seconds(start.strip())
         end = self.convert_srt_time_to_seconds(end.strip())
         return end-start
-
+    def total_seconds_from_corrected_srt(self, timestr):
+        """Converts a time string 'HH:MM:SS,mmm' to total seconds."""
+        hours, minutes, seconds = re.split('[:]', timestr)
+        seconds, milliseconds = re.split('[,]', seconds)
+        total_seconds = int(hours) * 3600 + int(minutes) * 60 + int(seconds) + int(milliseconds) / 1000000
+        return total_seconds
     def convert_srt_time_to_seconds(self, time_string):
         time_components = time_string.split(":")
         hours = int(time_components[0])

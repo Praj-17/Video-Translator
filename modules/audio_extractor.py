@@ -8,7 +8,7 @@ class AudioExtractor():
     def __init__(self) -> None:
         self.fo = FileOrganizer()
         pass
-    def extract_audio_from_video(self, video_path):
+    def extract_audio_to_mp3(self, video_path):
         video_clip = VideoFileClip(video_path) 
 
 
@@ -27,7 +27,7 @@ class AudioExtractor():
         video_clip.close()
         audio_clip.close()
         return output_path
-    def extract_audio_to_mp3(self, video_path):
+    def extract_audio_to_mp3_with_ffmpeg(self, video_path):
         output_path_folder,updated_video_path = self.fo.initialize(video_path)
         output_path = os.path.join(output_path_folder, self.fo.get_file_name_without_extension_from_path(video_path) + ".mp3")
 

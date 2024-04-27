@@ -51,7 +51,12 @@ class TrascribeSRT():
     '''
 
     #use the WhisperModel to transcribe the mp3 file
-    audio = whisper.load_audio(mp3_file)
+  
+    if os.path.exists(mp3_file):
+      print("This is the mp3 file", mp3_file)
+      audio = whisper.load_audio(mp3_file)
+    else:
+      raise ValueError(f"The Audio file {mp3_file} not found")
     # results = self.model.transcribe(mp3_file, beam_size=5)
     results = whisper.transcribe(self.model, audio, language="en")
 

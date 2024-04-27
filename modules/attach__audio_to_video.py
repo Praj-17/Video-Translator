@@ -2,7 +2,7 @@
 from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_audioclips
 
 
-class VideoAttacher():
+class VideoAttacher:
     def attach_audio_to_video(self, video_path, audio_path, output_path):
         # Load video and audio clips
         video_clip = VideoFileClip(video_path)
