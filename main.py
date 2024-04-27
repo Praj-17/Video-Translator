@@ -32,17 +32,6 @@ def generate_questions(video_path, n):
     questions = question_gen.generate_questions_from_given_video(video_path, n)
     return questions
 
-def create_questions_file(questions):
-    """Create a PDF file from the questions."""
-    path = "questions.pdf"
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    for question in questions:
-        pdf.cell(200, 10, txt=question, ln=True)
-    pdf.output(path)
-    return path
-
 # Define themes and add toggle button styles
 themes = {
     "dark": """
@@ -114,9 +103,7 @@ with gr.Blocks(css=themes[current_theme]) as app:
         questions_btn = gr.Button("Generate Questions")
         translated_video = gr.Video(label="Translated Video")
         video_summary = gr.Textbox(label="Video Summary", lines=10, interactive=True)
-        download_summary_btn = gr.File(label="Download Summary")
         video_questions = gr.Textbox(label="Questions Generated", lines=10, interactive=True)
-        download_questions_btn = gr.File(label="Download Questions")
         copy_summary_btn = gr.Button("Copy Summary")
         copy_questions_btn = gr.Button("Copy Questions")
 
@@ -127,13 +114,13 @@ with gr.Blocks(css=themes[current_theme]) as app:
     )
 
     summary_btn.click(
-        fn=lambda x: (generate_summary(x), create_summary_file(generate_summary(x))),
+        fn=lambda x: (generate_summary(x)),
         inputs=video_input,
         outputs=[video_summary, download_summary_btn]
     )
 
     questions_btn.click(
-        fn=lambda x, n: (generate_questions(x, n), create_questions_file(generate_questions(x, n))),
+        fn=lambda x, n: (generate_questions(x, n)),
         inputs=[video_input, num_questions_input],
         outputs=[video_questions, download_questions_btn]
     )
