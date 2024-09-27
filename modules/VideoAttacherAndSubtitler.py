@@ -8,7 +8,7 @@ from moviepy.editor import (
 )
 from moviepy.video.tools.subtitles import SubtitlesClip
 import os
-from file_organizer import FileOrganizer
+from modules.file_organizer import FileOrganizer
 
 
 class VideoAttacherAndSubtitler:
