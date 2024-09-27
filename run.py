@@ -26,6 +26,7 @@ class AsyncRunner:
 
     async def process_video(self, file_path, translate, questions, summary):
         tasks = []
+        print("Processing", file_path)
         if translate:
             tasks.append(self.translate(file_path))
         if questions:
@@ -38,6 +39,7 @@ class AsyncRunner:
 
     async def process_folder(self, folder_path, translate=False, questions=False, summary=False):
         for dirpath, _, filenames in os.walk(folder_path):
+
             video_files = [os.path.join(dirpath, filename) for filename in filenames if filename.lower().endswith(('.mp4', '.avi', '.mov', '.mkv', '.flv'))]
             await asyncio.gather(*(self.process_video(file, translate, questions, summary) for file in video_files))
 
@@ -46,5 +48,5 @@ def run_on_a_folder(folder_path, translate=False, questions=False, summary=False
     asyncio.run(runner.process_folder(folder_path, translate, questions, summary))
 
 if __name__ == "__main__":
-    folder_path = 'videos'  # Specify the folder path here
+    folder_path = 'lectures'  # Specify the folder path here
     run_on_a_folder(folder_path, translate=True)
