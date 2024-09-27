@@ -26,10 +26,10 @@ class MP3Merger():
         # Create a destination file to merge into
         destination_file = join(parent_folder, os.getenv("default_merged_file_name"))
         
-        with open(destination_file, 'wb') as dest:
+        with open(destination_file, 'wb', errors = "replace") as dest:
             for mp3_file in mp3_files:
                 mp3_file_path = join(folder_path, mp3_file)
-                with open(mp3_file_path, 'rb') as src:
+                with open(mp3_file_path, 'rb', errors = "replace") as src:
                     shutil.copyfileobj(src, dest)
         
 
@@ -44,7 +44,7 @@ class MP3Merger():
         destination_file = os.path.join(parent_folder, os.getenv("default_merged_file_with_silence_name"))
 
         #Load the initial_silence
-        with open(initial_silence_output_path,mode='r', encoding = "utf-8") as initial_silence_file:
+        with open(initial_silence_output_path,mode='r', encoding = "UTF-8", errors = "replace") as initial_silence_file:
            initial_silence =  float((initial_silence_file.read()).strip())
 
         final_audio = AudioSegment.silent(duration=initial_silence)
@@ -81,7 +81,7 @@ class MP3Merger():
 
 
     def parse_srt_file(self, file_path):
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, 'r', encoding='UTF-8', errors = "replace") as file:
             lines_with_timestamps = []
             lines = file.readlines()
             lines_with_timestamps = [line for line in lines if " --> " in line]

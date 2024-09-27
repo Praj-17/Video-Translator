@@ -19,7 +19,7 @@ class SRTCorrecter:
         # A regex pattern to identify timestamp lines and replace '.' with ',' in timestamps
         output_file = os.path.join(os.path.dirname(input_srt_path), os.getenv("corrected_srt_name"))
         
-        with open(input_srt_path, 'r', encoding='utf-8') as infile, open(output_file, 'w', encoding='utf-8') as outfile:
+        with open(input_srt_path, 'r', encoding='UTF-8', errors = "replace") as infile, open(output_file, 'w', encoding='UTF-8', errors = "replace") as outfile:
             for line in infile:
                 # Check if the line contains a timestamp
                 if '-->' in line:
@@ -36,7 +36,7 @@ class SRTCorrecter:
 
 
             # Open the output file again to remove the last empty newline character
-        with open(output_file, 'r+', encoding='utf-8') as outfile:
+        with open(output_file, 'r+', encoding='UTF-8', errors = "replace") as outfile:
             content = outfile.readlines()
             if content[-1] == '\n':  # Check if the last line is an empty newline
                 outfile.seek(0)  # Go to the beginning of the file

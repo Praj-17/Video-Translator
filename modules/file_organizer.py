@@ -6,7 +6,7 @@ import os
 load_dotenv()
 class FileOrganizer():
     def __init__(self) -> None:
-        pass
+        self.default_dir = os.getenv("default_output_folder_name")
     def create_folder_if_not_exists(self, folder_path):
         """
         Check if a folder exists, if not, create it.
@@ -44,7 +44,7 @@ class FileOrganizer():
         updated_video_path = os.path.join(created_folder_path, os.path.basename(video_file_name))
         return created_folder_path,updated_video_path
     def get_mp3_name_from_video_name(self, video_name):
-        return os.path.join(os.path.dirname(video_name), self.get_file_name_without_extension_from_path(video_name) + ".mp3")
+        return os.path.join(self.default_dir, self.get_file_name_without_extension_from_path(video_name), self.get_file_name_without_extension_from_path(video_name) + ".mp3")
     def get_srt_name_from_video_name(self, video_name):
         return os.path.join( os.path.dirname(video_name), os.getenv("default_srt_file_name"))
     def get_audio_split_path(self, video_name):

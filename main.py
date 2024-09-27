@@ -116,13 +116,13 @@ with gr.Blocks(css=themes[current_theme]) as app:
     summary_btn.click(
         fn=lambda x: (generate_summary(x)),
         inputs=video_input,
-        outputs=[video_summary, download_summary_btn]
+        outputs=[video_summary]
     )
 
     questions_btn.click(
         fn=lambda x, n: (generate_questions(x, n)),
         inputs=[video_input, num_questions_input],
-        outputs=[video_questions, download_questions_btn]
+        outputs=[video_questions]
     )
 
     copy_summary_btn.click(

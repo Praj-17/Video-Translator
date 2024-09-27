@@ -4,7 +4,7 @@ import datetime
 import os
 from dotenv import load_dotenv
 import os
-
+import torch
 # Load environment variables from .env file
 load_dotenv()
 
@@ -12,12 +12,13 @@ load_dotenv()
 
 
 
-class TrascribeSRT():
+class TranscribeSRT():
   def __init__(self) -> None:
     model_size = os.getenv("model_size")
+    self.device = "cuda" if torch.cuda.is_available() else "cpu"
     self.model = whisper.load_model(model_size, device="cpu")
 
-  def mp3_to_translated_srt(self, mp3_file,destination_language = "es"):
+  def mp3_to_translated_srt(self, mp3_file,destination_language = "es", source_langauge = "en"):
 
     '''
     Function that transcribes an MP3 audio file then trnaslates the string into
@@ -53,12 +54,12 @@ class TrascribeSRT():
     #use the WhisperModel to transcribe the mp3 file
   
     if os.path.exists(mp3_file):
-      print("This is the mp3 file", mp3_file)
+      print("This is the mp3 file", mp3_file, "running on ", self.device)
       audio = whisper.load_audio(mp3_file)
     else:
       raise ValueError(f"The Audio file {mp3_file} not found")
     # results = self.model.transcribe(mp3_file, beam_size=5)
-    results = whisper.transcribe(self.model, audio, language="en")
+    results = whisper.transcribe(self.model, audio, language=source_langauge)
 
     original_subs = ''
 
@@ -149,6 +150,6 @@ class TrascribeSRT():
 
 if __name__ == "__main__":
     print("Transcribing the video now....This may take a while on CPU")
-    ts = TrascribeSRT()
-    ts.mp3_to_translated_srt('demo4.mp3','es')
-    ts.srt_translate('es_3.srt','es')
+    ts = TranscribeSRT()
+    ts.mp3_to_translated_srt(r'D:\Video-Translator\output\test\test.mp3')
+    # ts.srt_translate('es_3.srt','es')

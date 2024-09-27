@@ -1,151 +1,141 @@
-from moviepy.editor import VideoFileClip, concatenate_videoclips, CompositeVideoClip,TextClip, AudioFileClip
+from moviepy.editor import (
+    VideoFileClip,
+    CompositeVideoClip,
+    TextClip,
+    AudioFileClip,
+    concatenate_audioclips,
+    AudioClip,
+)
 from moviepy.video.tools.subtitles import SubtitlesClip
 import os
-from pydub import AudioSegment
-from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips, CompositeVideoClip
-import numpy as np
-from moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip, concatenate_audioclips
-from moviepy.audio.AudioClip import AudioClip
-from modules.file_organizer import FileOrganizer
-
+from file_organizer import FileOrganizer
 
 
 class VideoAttacherAndSubtitler:
-    def __init__(self) -> None:
+    def __init__(self):
         self.fo = FileOrganizer()
 
     def attach_audio_to_video(self, video_path, audio_path, output_path):
         video_clip = VideoFileClip(video_path)
-        audio_clip = VideoFileClip(audio_path)
-        
+        audio_clip = AudioFileClip(audio_path)
+
+        # Ensure audio duration matches video duration
         if audio_clip.duration < video_clip.duration:
             silence_duration = video_clip.duration - audio_clip.duration
-            silent_audio = audio_clip.subclip(0, 0).set_duration(silence_duration)
-            audio_clip = concatenate_videoclips([audio_clip, silent_audio])
-        
+            silent_audio = AudioClip(
+                lambda t: [0] * audio_clip.nchannels,
+                duration=silence_duration,
+                fps=audio_clip.fps,
+            )
+            audio_clip = concatenate_audioclips([audio_clip, silent_audio])
+        else:
+            audio_clip = audio_clip.subclip(0, video_clip.duration)
+
         video_clip = video_clip.set_audio(audio_clip)
-        
-        video_clip.write_videofile(output_path, codec='libx264', audio_codec='aac', fps=60)
-        
+        video_clip.write_videofile(
+            output_path, codec="libx264", audio_codec="aac", fps=60
+        )
         video_clip.close()
-
+        audio_clip.close()
         return output_path
+    def create_subtitles_clip(self, srt_file, video_width, video_height):
+        # Subtitles occupy full width
+        subtitle_width = int(video_width)
+        
+        # Reduced font size for less obtrusive subtitles
+        fontsize = 18  # Adjust as needed to reduce height further
+        
+        # Generator function to create TextClips with custom styling and wrapping
+        def subtitle_generator(txt):
+            # Set size to (subtitle_width - padding, None) to allow automatic height adjustment
+            text_clip = TextClip(
+                txt,
+                font="Arial-Bold",
+                fontsize=fontsize,
+                color="yellow",
+                stroke_color="black",
+                stroke_width=1,
+                method="caption",
+                size=(subtitle_width - 40, None),  # Padding of 20 pixels on each side
+                align="center",
+            )
+            # Create a semi-transparent background that spans the full width
+            from moviepy.editor import ColorClip
 
-    def create_subtitles_clip(self, srt_file):
-        def generator(txt):
-            words = txt.split()
-            lines = []
-            current_line = ''
-            for word in words:
-                if len(current_line.split()) < 10:
-                    current_line += ' ' + word
-                else:
-                    lines.append(current_line.strip())
-                    current_line = word
-            if current_line:
-                lines.append(current_line.strip())
+            background = ColorClip(
+                size=(subtitle_width, text_clip.h + 20),  # Padding of 10 pixels on top and bottom
+                color=(0, 0, 0)
+            ).set_opacity(0.7)
+            
+            # Composite the text over the background
+            text_with_bg = CompositeVideoClip(
+                [background, text_clip.set_position(("center", "center"))],
+                size=(subtitle_width, text_clip.h + 20),
+                bg_color=(0,0,0,0)  # Ensure the background is transparent outside the background clip
+            )
+            return text_with_bg
 
-            text_clips = [TextClip(line, font='Arial-Bold', fontsize=28, color='yellow', stroke_color='black', stroke_width=2, method='caption').on_color(size=(TextClip(line, font='Arial-Bold', fontsize=28, color='yellow', method='caption').size[0]+30, TextClip(line, font='Arial-Bold', fontsize=28, color='yellow', method='caption').size[1]+20), color=(0,0,0), pos=('center','center'), col_opacity=0.8) for line in lines]
-
-            subtitles_clip = concatenate_videoclips(text_clips, method="compose")
-
-            return subtitles_clip
-
-        subtitles = SubtitlesClip(srt_file, generator)
+        subtitles = SubtitlesClip(srt_file, subtitle_generator)
+        # Set position to bottom center
+        subtitles = subtitles.set_position(("center", "bottom"))
         return subtitles
-        # Function to create subtitles clip with custom styling
-    def create_subtitles_clip_2(self, srt_file):
-        # Generate a lambda function to attach subtitles using TextClip with custom styling
-        generator = lambda txt: TextClip(txt, 
-                                        font='Arial-Bold', 
-                                        fontsize=28, 
-                                        color='yellow', 
-                                        stroke_color='black', 
-                                        stroke_width=2, 
-                                        method='caption'). \
-                                        on_color(size=(TextClip(txt, 
-                                                                font='Arial-Bold', 
-                                                                fontsize=28, 
-                                                                color='yellow', 
-                                                                method='caption').size[0]+200, 
-                                                        max(TextClip(txt, 
-                                                                    font='Arial-Bold', 
-                                                                    fontsize=28, 
-                                                                    color='yellow', 
-                                                                    method='caption').size[1], 1)), 
-                                                color=(0,0,0), 
-                                                pos=('center','center'), 
-                                                col_opacity=0.8)
-
-        # Create a subtitles clip
-        subtitles = SubtitlesClip(srt_file, generator)
-        return subtitles
-
 
 
 
     def add_subtitles_and_audio_to_video(self, video_path, audio_path, srt_file):
         output_path_folder = os.path.dirname(audio_path)
-        output_path = os.path.join(output_path_folder, self.fo.get_file_name_without_extension_from_path(video_path) + "_translated" +  ".mp4")
+        output_path = os.path.join(
+            output_path_folder,
+            self.fo.get_file_name_without_extension_from_path(video_path)
+            + "_translated.mp4",
+        )
 
         video_clip = VideoFileClip(video_path)
         audio_clip = AudioFileClip(audio_path)
 
+        # Ensure audio duration matches video duration
         if audio_clip.duration < video_clip.duration:
             silence_duration = video_clip.duration - audio_clip.duration
-            # Generate silent audio segment
-            silent_audio = AudioClip(lambda t: [0] * audio_clip.nchannels, duration=silence_duration, fps=audio_clip.fps)
-            # Concatenate audio clip with silent audio to match the video's duration
+            silent_audio = AudioClip(
+                lambda t: [0] * audio_clip.nchannels,
+                duration=silence_duration,
+                fps=audio_clip.fps,
+            )
             audio_clip = concatenate_audioclips([audio_clip, silent_audio])
+        else:
+            audio_clip = audio_clip.subclip(0, video_clip.duration)
 
         video_clip = video_clip.set_audio(audio_clip)
 
-        subtitles = self.create_subtitles_clip_2(srt_file)
+        # Create subtitles clip with proper width and height
+        subtitles = self.create_subtitles_clip(srt_file, video_clip.w, video_clip.h)
 
-        final_video = CompositeVideoClip([video_clip, subtitles.set_position(('center', 'bottom'))])
+        # Composite the video with subtitles
+        final_video = CompositeVideoClip([video_clip, subtitles])
 
-        final_video.write_videofile(output_path, codec='libx264', temp_audiofile='temp-audio.m4a', remove_temp=True, audio_codec='aac')
+        final_video.write_videofile(
+            output_path,
+            codec="libx264",
+            temp_audiofile="temp-audio.m4a",
+            remove_temp=True,
+            audio_codec="aac",
+        )
 
         video_clip.close()
+        audio_clip.close()
+        final_video.close()
 
         return output_path
 
 
-
-    def add_subtitles_and_audio_to_video_2(self, video_path, audio_path, srt_file, output_path):
-            
-            print("Vidoe Path ", video_path)
-            print("audio Path ", audio_path)
-            print("srt file ", srt_file)
-            print("output path", output_path)
-            video_clip = VideoFileClip(video_path)
-            audio_clip = AudioFileClip(audio_path)
-            
-            if audio_clip.duration < video_clip.duration :
-                silence_duration = video_clip.duration - audio_clip.duration
-                silent_audio = AudioSegment.silent(duration=silence_duration)
-                print(audio_clip, silent_audio)
-                print(type(audio_clip), type(silent_audio))
-                audio_clip = audio_clip + silent_audio
-            
-            video_clip = video_clip.set_audio(audio_clip)
-
-            subtitles = self.create_subtitles_clip_2(srt_file)
-
-            final_video = CompositeVideoClip([video_clip, subtitles.set_position(('center', 'bottom'))])
-
-            final_video.write_videofile(output_path, codec='libx264', temp_audiofile='temp-audio.m4a', remove_temp=True, audio_codec='aac')
-            
-            video_clip.close()
-
-            return output_path
-
 if __name__ == "__main__":
     # Example usage
-    video_file = r'output\small_talk\small_talk_translated.mp4'  # Path to your video file
-    audio_file = r'path_to_audio_file.mp3'  # Path to your audio file
-    srt_file = r'output\small_talk\corrected_srt.srt'  # Path to your SRT file
-    output_file = r'output\small_talk\output_with_subtitles.mp4'  # Output path for the final video
+    video_file = r"D:\Video-Translator\videos\test.mp4"  # Path to your video file
+    audio_file = r"D:\Video-Translator\output\test\test.mp3"  # Path to your audio file
+    srt_file = r"D:\Video-Translator\output\test_medium\corrected_srt.srt"  # Path to your SRT file
+    output_file = r"output_with_subtitles.mp4"  # Output path for the final video
 
     video_attacher_and_subtitler = VideoAttacherAndSubtitler()
-    video_attacher_and_subtitler.add_subtitles_and_audio_to_video(video_file, audio_file, srt_file, output_file)
+    video_attacher_and_subtitler.add_subtitles_and_audio_to_video(
+        video_file, audio_file, srt_file
+    )

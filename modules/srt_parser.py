@@ -3,7 +3,7 @@ class SRTParser:
         pass
     def extract_first_subtitle_info(self, srt_file):
         try:
-            with open(srt_file, 'r', encoding="utf-8") as file:
+            with open(srt_file, 'r', encoding="UTF-8", errors = "replace") as file:
                 lines = file.readlines()
 
                 # Initialize variables to store subtitle information
@@ -46,7 +46,7 @@ class SRTParser:
     def extract_all_subtitle_info(self, srt_file):
         subtitles = []
         try:
-            with open(srt_file, 'r', encoding="utf-8") as file:
+            with open(srt_file, 'r', encoding="UTF-8", errors = "replace") as file:
                 lines = file.readlines()
 
                 # Initialize variables to store subtitle information

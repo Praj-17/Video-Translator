@@ -37,7 +37,7 @@ class SRTToAudioConverter():
         else:
             initial_silence = 0.0
         
-        with open(initial_silence_output_path,mode='w', encoding = "utf-8") as initial_silence_file:
+        with open(initial_silence_output_path,mode='w', encoding = "UTF-8", errors = "replace") as initial_silence_file:
             initial_silence_file.write(str(initial_silence))
 
         

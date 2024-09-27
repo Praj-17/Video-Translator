@@ -47,4 +47,4 @@ def run_on_a_folder(folder_path, translate=False, questions=False, summary=False
 
 if __name__ == "__main__":
     folder_path = 'videos'  # Specify the folder path here
-    run_on_a_folder(folder_path, translate=True, questions=True, summary=True)
+    run_on_a_folder(folder_path, translate=True)
