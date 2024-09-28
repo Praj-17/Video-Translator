@@ -53,6 +53,8 @@ class FileOrganizer():
         return os.path.join(os.path.dirname(video_name), os.getenv("default_merged_file_with_silence_name"))
     def get_corrected_srt_name(self, video_name):
         return  os.path.join(os.path.dirname(video_name), os.getenv("corrected_srt_name"))
+    def get_original_srt_file_name(self, video_name):
+        return  os.path.join(os.path.join( os.path.dirname(video_name), os.getenv("defualt_original_subtitles_name")))
     def get_final_video_name(self, video_name):
         return os.path.join(os.path.dirname(video_name), self.get_file_name_without_extension_from_path(video_name) + "_translated" +  ".mp4")
     def get_initial_silence_output_path(self, video_name):

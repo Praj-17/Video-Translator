@@ -16,7 +16,7 @@ class TranscribeSRT():
   def __init__(self) -> None:
     model_size = os.getenv("model_size")
     self.device = "cuda" if torch.cuda.is_available() else "cpu"
-    self.model = whisper.load_model(model_size, device=self.device)
+    self.model = whisper.load_model(model_size, device="cpu")
 
   def mp3_to_translated_srt(self, mp3_file,destination_language = "es", source_langauge = "en"):
 
