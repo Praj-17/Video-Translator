@@ -1,6 +1,11 @@
 # Use an official Python 3.12 runtime as a parent image
 FROM python:3.12-slim
 
+# Install ffmpeg and clean up to reduce image size
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ffmpeg && \
+    rm -rf /var/lib/apt/lists/*
+
 # Set the working directory in the container to /app
 WORKDIR /app
 
@@ -12,10 +17,6 @@ RUN pip install --no-cache-dir --upgrade pip
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-
-RUN pip uninstall moviepy decorators
-RUN pip install decorators
-RUN pip install moviepy
 
 # Copy the rest of the working directory contents into the container
 COPY . /app
