@@ -13,6 +13,10 @@ RUN pip install --no-cache-dir --upgrade pip
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN pip uninstall moviepy decorators
+RUN pip install decorators
+RUN pip install moviepy
+
 # Copy the rest of the working directory contents into the container
 COPY . /app
 
