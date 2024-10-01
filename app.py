@@ -4,6 +4,7 @@ import io
 import sys
 import threading
 import time
+import json
 
 # Import your custom modules
 from video_translator import VideoTranslator
@@ -29,45 +30,164 @@ class StreamToTextIO(io.StringIO):
     def getvalue(self):
         return self.output
 
+def submit_api_key(api_key):
+    """
+    Handles the submission of the OpenAI API key.
+    Stores the key in environment variables and session state.
+    """
+    if api_key:
+        os.environ['OPENAI_API_KEY'] = api_key
+        st.session_state.api_key_submitted = True
+        st.success("API Key submitted successfully!")
+    else:
+        st.error("Please enter a valid API Key.")
+
+def is_api_key_submitted():
+    """
+    Checks if the OpenAI API key has been submitted.
+    """
+    return st.session_state.get('api_key_submitted', False)
+
+def generate_summary(video_path, language):
+    """
+    Generates a summary for the given video.
+    Handles errors related to API key issues.
+    """
+    try:
+        summary = summarizer.generate_summary_from_given_video(video_path, language=language)
+        return summary
+    except Exception as e:
+        st.error(f"Error generating summary: {e}")
+        return None
+
+def generate_questions(video_path, num_questions, language):
+    """
+    Generates questions for the given video.
+    Handles errors related to API key issues.
+    """
+    try:
+        questions = question_gen.generate_questions_from_given_video(
+            video_path,
+            num_questions,
+            language=language
+        )
+        return questions
+    except Exception as e:
+        st.error(f"Error generating questions: {e}")
+        return None
+
 def main():
     st.set_page_config(page_title="Video Translator", layout="wide")
     st.title("🎥 Video Translator")
 
+    # Initialize session state for API key submission
+    if 'api_key_submitted' not in st.session_state:
+        st.session_state.api_key_submitted = False
+
+    # Define language mappings
+    languages = {
+        'English': 'en',
+        'Spanish': 'es',
+        'French': 'fr',
+        'German': 'de',
+        'Italian': 'it',
+        'Portuguese': 'pt',
+        'Russian': 'ru',
+        'Chinese': 'zh',
+        'Japanese': 'ja',
+        'Korean': 'ko'
+    }
+
+    # Define voice options
+    voices = {
+        'Female': 0,
+        'Male': 1
+    }
+
     # Sidebar for Translation Options and Additional Features
     with st.sidebar:
         st.header("Translation Options")
-        voice_type = st.number_input("Voice Type (1-10)", min_value=1, max_value=10, value=1, step=1)
-        languages = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'zh', 'ja', 'ko']
-        source_language = st.selectbox("Source Language", languages, index=0)
-        destination_language = st.selectbox("Destination Language", languages, index=1)
+
+        # Change 2: Voice selection as dropdown
+        voice_label_mapping = {
+            'Female': 0,
+            'Male': 1
+        }
+        selected_voice = st.selectbox("Voice Type", list(voices.keys()), index=0)
+        voice_type = voices[selected_voice]
+
+        # Change 3: Full language names in UI
+        source_language_name = st.selectbox("Source Language", list(languages.keys()), index=0)
+        source_language = languages[source_language_name]
+
+        destination_language_name = st.selectbox("Destination Language", list(languages.keys()), index=1)
+        destination_language = languages[destination_language_name]
+
         audio = st.checkbox("Generate Audio", value=False)
         attach = st.checkbox("Attach Audio and Subtitles to Video", value=False)
 
         st.header("Additional Features")
 
+        # OpenAI API Key Input
+        st.subheader("OpenAI API Key")
+        api_key_input = st.text_input("Enter your OpenAI API Key", type="password")
+        if st.button("Submit API Key"):
+            submit_api_key(api_key_input)
+
+        st.markdown("---")
+
         # Generate Summary
-        if st.button("Generate Summary"):
+        st.subheader("Generate Summary")
+        summary_language_name = st.selectbox("Summary Language", list(languages.keys()), index=0, key="summary_language")
+        summary_language = languages[summary_language_name]
+
+        # Disable button if API key not submitted
+        summary_disabled = not is_api_key_submitted()
+        if summary_disabled:
+            st.warning("Please submit your OpenAI API Key to enable this feature.")
+
+        if st.button("Generate Summary", disabled=summary_disabled):
             if 'video_path' not in st.session_state:
                 st.error("Please translate a video first.")
             else:
                 with st.spinner("Generating summary..."):
-                    summary = summarizer.generate_summary_from_given_video(st.session_state.video_path)
-                st.subheader("Video Summary")
-                st.text_area("Summary", summary, height=200)
-                st.download_button(label="Download Summary", data=summary, file_name="summary.txt", mime="text/plain")
+                    summary = generate_summary(st.session_state.video_path, language=summary_language)
+                if summary:
+                    st.subheader("Video Summary")
+                    st.text_area("Summary", summary, height=200)
+                    st.download_button(label="Download Summary", data=summary, file_name="summary.txt", mime="text/plain")
 
         # Generate Questions
+        st.subheader("Generate Questions")
         num_questions = st.number_input("Number of Questions", min_value=1, max_value=20, value=5, step=1)
-        if st.button("Generate Questions"):
+        questions_language_name = st.selectbox("Questions Language", list(languages.keys()), index=0, key="questions_language")
+        questions_language = languages[questions_language_name]
+
+        # Disable button if API key not submitted
+        questions_disabled = not is_api_key_submitted()
+        if questions_disabled:
+            st.warning("Please submit your OpenAI API Key to enable this feature.")
+
+        if st.button("Generate Questions", disabled=questions_disabled):
             if 'video_path' not in st.session_state:
                 st.error("Please translate a video first.")
             else:
                 with st.spinner("Generating questions..."):
-                    questions = question_gen.generate_questions_from_given_video(st.session_state.video_path, num_questions)
-                st.subheader("Generated Questions")
-                questions_text = '\n'.join(questions)
-                st.text_area("Questions", questions_text, height=200)
-                st.download_button(label="Download Questions", data=questions_text, file_name="questions.txt", mime="text/plain")
+                    questions = generate_questions(
+                        st.session_state.video_path,
+                        num_questions,
+                        language=questions_language
+                    )
+                if questions:
+                    st.subheader("Generated Questions")
+                    questions_json = {"questions": questions}
+                    st.json(questions_json, expanded=True)
+                    st.download_button(
+                        label="Download Questions",
+                        data=json.dumps(questions_json, indent=4),
+                        file_name="questions.json",
+                        mime="application/json"
+                    )
 
     # Main Page for Video Input and Translation
     st.header("Video Input")
@@ -148,23 +268,34 @@ def main():
         if os.path.exists(audio_file):
             st.subheader("Extracted Audio")
             st.audio(audio_file)
+            # Change 1: Download button for Extracted Audio
+            with open(audio_file, "rb") as af:
+                audio_bytes = af.read()
+            st.download_button(
+                label="Download Extracted Audio",
+                data=audio_bytes,
+                file_name=os.path.basename(audio_file),
+                mime="audio/mpeg"
+            )
         else:
             st.warning(f"Extracted audio not found at {audio_file}")
+
         # Display Translated Video
         final_video = translator.file_organizer.get_final_video_name(audio_file)  # Assuming the translated video is saved as video_name.mp4
         if os.path.exists(final_video):
             st.subheader("Translated Video")
             st.video(final_video)
+            # Change 1: Download button for Translated Video
+            with open(final_video, "rb") as vf:
+                video_bytes = vf.read()
+            st.download_button(
+                label="Download Translated Video",
+                data=video_bytes,
+                file_name=os.path.basename(final_video),
+                mime="video/mp4"
+            )
         else:
             st.warning(f"Translated video not found at {final_video}")
-
-        # Display Extracted Audio
-        audio_file = translator.file_organizer.get_mp3_name_from_video_name(video_name)
-        if os.path.exists(audio_file):
-            st.subheader("Extracted Audio")
-            st.audio(audio_file)
-        else:
-            st.warning(f"Extracted audio not found at {audio_file}")
 
         # Display Corrected SRT File
         corrected_srt = translator.file_organizer.get_corrected_srt_name(audio_file)
@@ -173,6 +304,13 @@ def main():
             with open(corrected_srt, 'r', encoding='utf-8') as f:
                 srt_content = f.read()
             st.text_area("Corrected SRT Content", srt_content, height=300)
+            # Change 1: Download button for Corrected SRT
+            st.download_button(
+                label="Download Translated Transcript",
+                data=srt_content,
+                file_name="translated_transcript.srt",
+                mime="text/plain"
+            )
         else:
             st.warning(f"Translated Transcript not found at {corrected_srt}")
 
@@ -183,7 +321,12 @@ def main():
             with open(transcript_file, 'r', encoding='utf-8') as f:
                 transcript_content = f.read()
             st.text_area("Transcript", transcript_content, height=300)
-            st.download_button(label="Download Transcript", data=transcript_content, file_name="transcript.txt", mime="text/plain")
+            st.download_button(
+                label="Download Original Transcript",
+                data=transcript_content,
+                file_name="transcript.txt",
+                mime="text/plain"
+            )
         else:
             st.warning(f"Transcript file not found at {transcript_file}")
 
