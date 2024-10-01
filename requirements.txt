@@ -18,3 +18,4 @@ SpeechRecognition==3.10.3
 whisper_timestamped==1.15.3
 srt
 streamlit
+tk-tools

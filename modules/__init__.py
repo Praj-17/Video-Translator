@@ -8,5 +8,5 @@ from modules.add_subtitles import SubtitleAdder
 from modules.correct_srt import SRTCorrecter
 from modules.VideoAttacherAndSubtitler import VideoAttacherAndSubtitler
 from modules.GetTextFromVideo import GetTextFromVideo
-from modules.tempo import TempoAnalyzer
-from modules.pitch import PitchAnalyzer
+# from modules.tempo import TempoAnalyzer
+# from modules.pitch import PitchAnalyzer

@@ -1,9 +1,12 @@
 # Use an official Python 3.12 runtime as a parent image
 FROM python:3.12-slim
 
-# Install ffmpeg and ImageMagick, then clean up
+# Install system dependencies and clean up
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg imagemagick && \
+    apt-get install -y --no-install-recommends \
+        ffmpeg \
+        imagemagick \
+        python3-tk && \
     rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container to /app
@@ -15,8 +18,11 @@ COPY requirements.txt /app/
 # Upgrade pip to the latest version
 RUN pip install --no-cache-dir --upgrade pip
 
-# Install any needed packages specified in requirements.txt
+# Install Python packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Install tk-tools separately if not included in requirements.txt
+RUN pip install --no-cache-dir tk-tools
 
 # Copy the rest of the working directory contents into the container
 COPY . /app
