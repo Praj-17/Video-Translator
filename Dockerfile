@@ -1,9 +1,9 @@
 # Use an official Python 3.12 runtime as a parent image
 FROM python:3.12-slim
 
-# Install ffmpeg and clean up to reduce image size
+# Install ffmpeg and ImageMagick, then clean up
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg && \
+    apt-get install -y --no-install-recommends ffmpeg imagemagick && \
     rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container to /app
