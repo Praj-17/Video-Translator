@@ -6,8 +6,8 @@ from modules import SRTToAudioConverter
 from modules import MP3Merger
 from modules import SRTCorrecter
 from modules import VideoAttacherAndSubtitler           
-from modules import TempoAnalyzer
-from modules import PitchAnalyzer
+# from modules import TempoAnalyzer
+# from modules import PitchAnalyzer
 import os
 
 class VideoTranslator:
@@ -19,8 +19,8 @@ class VideoTranslator:
        self.mp3_merger = MP3Merger()
        self.audio_attacher_and_subtitler = VideoAttacherAndSubtitler()
        self.correcter = SRTCorrecter()
-       self.tempo = TempoAnalyzer()
-       self.pitch_analyzer = PitchAnalyzer()
+    #    self.tempo = TempoAnalyzer()
+    #    self.pitch_analyzer = PitchAnalyzer()
 
     def transcribe_given_video(self, path_to_video, source_language = "en"):
         # #Step 1 is to extract the audio

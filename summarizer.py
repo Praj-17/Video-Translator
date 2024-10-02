@@ -7,7 +7,7 @@ import os
 
 # Load environment variables from .env file
 load_dotenv()
-client = OpenAI(api_key = os.getenv("OPENAI_API_KEY"))
+
 from modules.srt_parser import SRTParser
 # from lang_translator import Translator
 
@@ -19,9 +19,9 @@ class OpenAISummarizer:
         self.get_text = GetTextFromVideo()
         self.fo = FileOrganizer()
         self.prompt_file_location = os.getenv("summary_prompt_file_location")
-    def call_openai(self, summary_prompt):
+    def call_openai(self, summary_prompt, api_key):
 
-        
+        client = OpenAI(api_key = api_key)
         completion = client.chat.completions.create(
         model=os.getenv("model_name"),
         messages=[
@@ -47,7 +47,7 @@ class OpenAISummarizer:
             chunks.append(current_chunk.strip())
         return chunks
 
-    def generate_summary(self, text, language = "spanish"):
+    def generate_summary(self, text,api_key, language = "spanish"):
         prompt = "create summary in {dest_lang} for {content}"
         text_chunks = self.split_text_into_chunks(text)
         summaries = []
@@ -57,7 +57,7 @@ class OpenAISummarizer:
             f.close()
         for chunk in text_chunks:
             summary_prompt = prompt.format(dest_lang = language, content = chunk )
-            summary = self.call_openai(summary_prompt)
+            summary = self.call_openai(summary_prompt, api_key = api_key)
             summaries.append(summary)
             # Concatenate summaries of all chunks
         return   " ".join(summaries)
@@ -73,7 +73,7 @@ class OpenAISummarizer:
             s.write(summary)
         return summary_save_file
     
-    def generate_summary_from_given_video(self, video_name, language = "spanish"):
+    def generate_summary_from_given_video(self, video_name,api_key,  language = "spanish"):
         text_to_read = os.path.join(os.getenv("default_output_folder_name"), self.fo.get_file_name_without_extension_from_path(video_name), os.getenv("default_text_save_file_name"))
         if not os.path.exists(text_to_read):
             text_to_read = self.get_text.get_text_from_video(video_name, language = language)
@@ -83,7 +83,7 @@ class OpenAISummarizer:
                 context = f.read()
         except Exception as e:
             print("Please translate the video first")
-        summary = self.generate_summary(text=context,language = language)
+        summary = self.generate_summary(text=context, api_key=api_key , language = language)
         summary_save_file = self.save_generated_summary(text_to_read, summary)
         return summary
 

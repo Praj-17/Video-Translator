@@ -37,6 +37,7 @@ def submit_api_key(api_key):
     """
     if api_key:
         os.environ['OPENAI_API_KEY'] = api_key
+        st.session_state.api_key = api_key  # Store the API key in session state
         st.session_state.api_key_submitted = True
         st.success("API Key submitted successfully!")
     else:
@@ -51,10 +52,18 @@ def is_api_key_submitted():
 def generate_summary(video_path, language):
     """
     Generates a summary for the given video.
-    Handles errors related to API key issues.
+    Passes the API key to the summarizer.
     """
+    api_key = st.session_state.get('api_key', None)
+    if not api_key:
+        st.error("API Key not found. Please submit your API Key.")
+        return None
     try:
-        summary = summarizer.generate_summary_from_given_video(video_path, language=language)
+        summary = summarizer.generate_summary_from_given_video(
+            video_path,
+            language=language,
+            api_key=api_key  # Pass the API key here
+        )
         return summary
     except Exception as e:
         st.error(f"Error generating summary: {e}")
@@ -63,13 +72,18 @@ def generate_summary(video_path, language):
 def generate_questions(video_path, num_questions, language):
     """
     Generates questions for the given video.
-    Handles errors related to API key issues.
+    Passes the API key to the question generator.
     """
+    api_key = st.session_state.get('api_key', None)
+    if not api_key:
+        st.error("API Key not found. Please submit your API Key.")
+        return None
     try:
         questions = question_gen.generate_questions_from_given_video(
             video_path,
             num_questions,
-            language=language
+            language=language,
+            api_key=api_key  # Pass the API key here
         )
         return questions
     except Exception as e:
@@ -80,9 +94,15 @@ def main():
     st.set_page_config(page_title="Video Translator", layout="wide")
     st.title("🎥 Video Translator")
 
-    # Initialize session state for API key submission
+    # Initialize session state
     if 'api_key_submitted' not in st.session_state:
         st.session_state.api_key_submitted = False
+    if 'translation_output' not in st.session_state:
+        st.session_state.translation_output = ''
+    if 'translation_running' not in st.session_state:
+        st.session_state.translation_running = False
+    if 'translation_complete' not in st.session_state:
+        st.session_state.translation_complete = False
 
     # Define language mappings
     languages = {
@@ -108,15 +128,11 @@ def main():
     with st.sidebar:
         st.header("Translation Options")
 
-        # Change 2: Voice selection as dropdown
-        voice_label_mapping = {
-            'Female': 0,
-            'Male': 1
-        }
+        # Voice selection as dropdown
         selected_voice = st.selectbox("Voice Type", list(voices.keys()), index=0)
         voice_type = voices[selected_voice]
 
-        # Change 3: Full language names in UI
+        # Full language names in UI
         source_language_name = st.selectbox("Source Language", list(languages.keys()), index=0)
         source_language = languages[source_language_name]
 
@@ -206,11 +222,13 @@ def main():
             video_path = os.path.join(temp_dir, uploaded_file.name)
             with open(video_path, 'wb') as f:
                 f.write(uploaded_file.read())
+            st.session_state.video_uploaded = True  # Flag to indicate video has been uploaded
         elif video_path_input:
             video_path = video_path_input
             if not os.path.exists(video_path):
                 st.error("The provided video path does not exist.")
                 st.stop()
+            st.session_state.video_uploaded = True  # Flag to indicate video has been provided
         else:
             st.error("Please upload a video file or input a local video path.")
             st.stop()
@@ -233,32 +251,21 @@ def main():
         # Placeholder for progress messages
         progress_placeholder = st.empty()
 
-        # Function to run translate
-        def run_translate():
-            translator.translate(
-                video_path,
-                voice_type=voice_type,
-                source_language=source_language,
-                destination_language=destination_language,
-                audio=audio,
-                attach=attach
-            )
-
-        # Run the translate function in a separate thread
-        translate_thread = threading.Thread(target=run_translate)
-        translate_thread.start()
-
-        # While the thread is alive, update the progress
-        while translate_thread.is_alive():
-            # Update the progress messages
-            progress_placeholder.text(output_captured.getvalue())
-            time.sleep(0.5)
-
-        # When done, update the progress messages one last time
-        progress_placeholder.text(output_captured.getvalue())
+        # Run the translate function directly (back to normal)
+        translator.translate(
+            video_path,
+            voice_type=voice_type,
+            source_language=source_language,
+            destination_language=destination_language,
+            audio=audio,
+            attach=attach
+        )
 
         # Reset stdout
         sys.stdout = original_stdout
+
+        # Display progress messages
+        st.text(output_captured.getvalue())
 
         st.success("Translation complete!")
 
@@ -268,7 +275,7 @@ def main():
         if os.path.exists(audio_file):
             st.subheader("Extracted Audio")
             st.audio(audio_file)
-            # Change 1: Download button for Extracted Audio
+            # Download button for Extracted Audio
             with open(audio_file, "rb") as af:
                 audio_bytes = af.read()
             st.download_button(
@@ -281,11 +288,11 @@ def main():
             st.warning(f"Extracted audio not found at {audio_file}")
 
         # Display Translated Video
-        final_video = translator.file_organizer.get_final_video_name(audio_file)  # Assuming the translated video is saved as video_name.mp4
+        final_video = translator.file_organizer.get_final_video_name(audio_file)
         if os.path.exists(final_video):
             st.subheader("Translated Video")
             st.video(final_video)
-            # Change 1: Download button for Translated Video
+            # Download button for Translated Video
             with open(final_video, "rb") as vf:
                 video_bytes = vf.read()
             st.download_button(
@@ -304,7 +311,7 @@ def main():
             with open(corrected_srt, 'r', encoding='utf-8') as f:
                 srt_content = f.read()
             st.text_area("Corrected SRT Content", srt_content, height=300)
-            # Change 1: Download button for Corrected SRT
+            # Download button for Corrected SRT
             st.download_button(
                 label="Download Translated Transcript",
                 data=srt_content,
