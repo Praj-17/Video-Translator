@@ -6,7 +6,6 @@ googletrans
 gradio==4.28.2
 librosa==0.10.1
 matplotlib==3.8.4
-moviepy==1.0.3
 numpy==1.26.4
 openai==1.23.6
 pydub==0.25.1
@@ -19,3 +18,4 @@ whisper_timestamped==1.15.3
 srt
 streamlit
 tk-tools
+moviepy==2.0.0.dev2
