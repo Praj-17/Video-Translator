@@ -141,6 +141,6 @@ if __name__ == "__main__":
     path_to_video = r"videos\test.mp4"
     
     trans = VideoTranslator()
-    trans.translate(path_to_video, audio = False)
+    trans.translate(path_to_video, audio = False, attach=True)
 
 

@@ -9,6 +9,7 @@ from moviepy.editor import (
 from moviepy.video.tools.subtitles import SubtitlesClip
 import os
 from modules.file_organizer import FileOrganizer
+import pysrt
 
 
 class VideoAttacherAndSubtitler:
@@ -38,23 +39,24 @@ class VideoAttacherAndSubtitler:
         video_clip.close()
         audio_clip.close()
         return output_path
+
     def create_subtitles_clip(self, srt_file, video_width, video_height):
         # Subtitles occupy full width
         subtitle_width = int(video_width)
         
         # Reduced font size for less obtrusive subtitles
-        fontsize = 18  # Adjust as needed to reduce height further
+        fontsize = 16  # Adjust as needed to reduce height further
         
         # Generator function to create TextClips with custom styling and wrapping
         def subtitle_generator(txt):
             # Set size to (subtitle_width - padding, None) to allow automatic height adjustment
             text_clip = TextClip(
                 txt,
-                font="Arial-Bold",
+                font="DejaVu-Sans-Bold",  # Updated font to support Spanish characters
                 fontsize=fontsize,
                 color="yellow",
-                stroke_color="black",
-                stroke_width=1,
+                stroke_color="white",
+                stroke_width=0.1,
                 method="caption",
                 size=(subtitle_width - 40, None),  # Padding of 20 pixels on each side
                 align="center",
@@ -71,16 +73,28 @@ class VideoAttacherAndSubtitler:
             text_with_bg = CompositeVideoClip(
                 [background, text_clip.set_position(("center", "center"))],
                 size=(subtitle_width, text_clip.h + 20),
-                bg_color=(0,0,0,0)  # Ensure the background is transparent outside the background clip
+                bg_color=(0, 0, 0, 0)  # Ensure the background is transparent outside the background clip
             )
             return text_with_bg
 
-        subtitles = SubtitlesClip(srt_file, subtitle_generator)
+        # Read the SRT file with UTF-8 encoding to handle Spanish characters
+        # with open(srt_file, 'r', encoding='utf-8') as f:
+        #     subtitles_content = f.read()
+                # Read the SRT file with UTF-8 encoding to handle Spanish characters
+        subs = pysrt.open(srt_file, encoding='utf-8')
+
+        # Convert subtitles into the format required by SubtitlesClip
+        subtitles_list = []
+        for sub in subs:
+            start = sub.start.ordinal / 1000.0  # Convert milliseconds to seconds
+            end = sub.end.ordinal / 1000.0
+            text = sub.text.replace('\n', ' ').replace('\r', '')
+            subtitles_list.append(((start, end), text))
+
+        subtitles = SubtitlesClip(srt_file, subtitle_generator, encoding='utf-8')
         # Set position to bottom center
         subtitles = subtitles.set_position(("center", "bottom"))
         return subtitles
-
-
 
     def add_subtitles_and_audio_to_video(self, video_path, audio_path, srt_file):
         output_path_folder = os.path.dirname(audio_path)
@@ -119,6 +133,7 @@ class VideoAttacherAndSubtitler:
             temp_audiofile="temp-audio.m4a",
             remove_temp=True,
             audio_codec="aac",
+            fps=video_clip.fps  # Ensure the frame rate matches the original video
         )
 
         video_clip.close()
