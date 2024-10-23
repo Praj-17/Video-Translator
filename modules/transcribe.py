@@ -88,6 +88,8 @@ class TranscribeSRT():
     with open(os.path.join( os.path.dirname(mp3_file), os.getenv("default_srt_file_name")),mode='w',  encoding = "utf-8") as sub_output:
       sub_output.write(translated_subs)
 
+  
+
     print('Translation Complete')
     
     return os.path.join( os.path.dirname(mp3_file), os.getenv("default_srt_file_name"))

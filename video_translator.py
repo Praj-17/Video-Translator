@@ -38,7 +38,7 @@ class VideoTranslator:
         srt_path = self.transcriber.transcribe_only(mp3_from_video,source_language )
         return srt_path
 
-    def translate(self, path_to_video, voice_type = 1, source_language = "en", destination_language = "es", audio = False, attach = False):
+    def translate(self, path_to_video, voice_type = 1, source_language = "en", destination_language = "es", audio = False, attach = True):
         # #Step 1 is to extract the audio
         output_path_folder,updated_video_path = self.file_organizer.initialize(path_to_video)
         
@@ -62,6 +62,10 @@ class VideoTranslator:
             if not os.path.exists(corrected_srt):
                     # Step-5 Correct the SRT file to be able to parse it
                     corrected_srt   = self.correcter.correct_srt_timestamps(srt_file)
+                    with open(corrected_srt, "r", encoding="utf-8") as csrt:
+                         to_write = csrt.read()
+                    with open(os.path.join( os.path.dirname(corrected_srt),"transcription.txt"),mode='w',  encoding = "utf-8") as text_output:
+                        text_output.write(to_write)
             if audio:
 
                 output_folder = self.file_organizer.get_audio_split_path(srt_file)
@@ -138,7 +142,7 @@ class VideoTranslator:
 
 if __name__ == "__main__": 
 
-    path_to_video = r"videos\test.mp4"
+    path_to_video = r"AI\Session01_final.mp4"
     
     trans = VideoTranslator()
     trans.translate(path_to_video, audio = False, attach=True)
