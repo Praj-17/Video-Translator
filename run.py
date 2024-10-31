@@ -48,5 +48,5 @@ def run_on_a_folder(folder_path, translate=False, questions=False, summary=False
     asyncio.run(runner.process_folder(folder_path, translate, questions, summary))
 
 if __name__ == "__main__":
-    folder_path = 'AI'  # Specify the folder path here
+    folder_path = 'programming'  # Specify the folder path here
     run_on_a_folder(folder_path, translate=True)
